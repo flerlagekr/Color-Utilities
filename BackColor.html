@@ -1,0 +1,19 @@
+<!-- 
+This html file creates a blank html page with a background color as 
+specified in the URL parameter, color (should be a hex color without #)
+This is being used to display a sample of a user-specified color
+that is embedded in a Tableau dashboard.
+-->
+<html>
+<body>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const color = urlParams.get('color')
+
+        window.onload = function() {
+            document.body.style.backgroundColor = "#" + color ;
+        };
+    </script>
+</body>
+</html>
