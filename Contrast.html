@@ -19,9 +19,9 @@ the contrast ratios compared to another color.
 
 <script>
     window.onload = (function(){
-		const queryString = window.location.search;
-		const urlParams = new URLSearchParams(queryString);
-		const hexCodes = urlParams.get('codes')
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const hexCodes = urlParams.get('codes')
         const contrastCode = urlParams.get('contrast')
         
         // Expects hex codes separated by dashes. Split to create the list
