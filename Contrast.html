@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <style>
+    body {
+        font-family: 'Poppins';font-size: 22px;
+    }
+    </style>
+    <title>Contrast Ratios</title>
+</head>
+<body>
+
+<canvas id="myCanvas"></canvas>
+
+<script>
+    window.onload = (function(){
+		const queryString = window.location.search;
+		const urlParams = new URLSearchParams(queryString);
+		const hexCodes = urlParams.get('codes')
+        const contrastCode = urlParams.get('contrast')
+        
+        // Expects hex codes separated by dashes. Split to create the list
+        hexList = hexCodes.split("-")
+
+        let c = document.getElementById("myCanvas");
+        let ctx = c.getContext("2d");
+        ctx.beginPath();
+
+        // Miscellaneous height, width, and position variables.
+        let xPosition = 10;
+        let yPosition = 10;
+        let rectWidth = 400;
+        let rectHeight = 125;
+        let fontPixels = 25;
+        let yJump = 10;
+        let xPad = 10;
+        let yPad = 12;
+        let yTextPad = 27;
+
+        // Initialize other variables.
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let lum = 0;
+        let cRatio = 0;
+
+        // Set background color.
+        document.body.style.backgroundColor = "#" + contrastCode;
+
+        // Set up the canvas dimensions and color.
+        ctx.canvas.width  = xPosition + rectWidth + xPad*2;
+        ctx.canvas.height = yPosition + (hexList.length) * (rectHeight + yJump) - yJump;
+
+        for (let i = 0; i < hexList.length; i++) {
+            colorHex = hexList[i].toLowerCase();
+
+            // Draw the rectangle.
+            ctx.fillStyle = "#" + colorHex;
+            ctx.fillRect(xPosition, yPosition, rectWidth, rectHeight);
+            ctx.stroke();
+
+            // Draw text on top of the rectangle.            
+            //ctx.font = "bold 25px Courier New";
+            ctx.font = "20px Poppins";
+            ctx.fillStyle = "#" + contrastCode;
+            ctx.textBaseline = "top";
+            ctx.fillText(colorHex.toUpperCase(), xPosition + xPad, yPosition + yPad);
+
+            // Calculate & display contrast ratio.
+            cRatio = contrastRatio(colorHex, contrastCode);
+            ctx.fillText("Contrast Ratio: " + cRatio.toString() + " : 1", xPosition + xPad, yPosition + yPad + yTextPad);
+
+            let textPass = "Fail";
+            let UIPass = "Fail";
+
+            if (cRatio >= 4.5) {
+                textPass = "Pass";
+            }
+
+            if (cRatio >= 3.0) {
+                UIPass = "Pass";
+            }
+
+            ctx.fillText("Text Elements: " + textPass, xPosition + xPad, yPosition + yPad + yTextPad*2);
+            ctx.fillText("UI/Graphics: " + UIPass, xPosition + xPad, yPosition + yPad + yTextPad*3);
+
+            yPosition = yPosition + rectHeight + yJump;
+        }
+    });
+
+    // Convert a hex color code to RGB values.
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    // Calculate the luminance of a hex color.
+    function Luminance(RValue, GValue, BValue) {
+        let RsRGB = RValue/255;
+        let GsRGB = GValue/255;
+        let BsRGB = BValue/255;
+
+        let R = 0;
+        let G = 0;
+        let B = 0;
+
+        if (RsRGB <= 0.03928) {
+            R = RsRGB/12.92;
+        } else {
+            R = Math.pow((RsRGB+0.055)/1.055, 2.4);
+        }
+
+        if (GsRGB <= 0.03928) {
+            G = GsRGB/12.92;
+        } else {
+            G = Math.pow((GsRGB+0.055)/1.055, 2.4);
+        }
+
+        if (BsRGB <= 0.03928) {
+            B = BsRGB/12.92;
+        } else {
+            B = Math.pow((BsRGB+0.055)/1.055, 2.4);
+        }
+
+        // Calculate luminance.
+        let Lum = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+
+        return Lum;
+    }
+
+    // Calculate the contrast ratio between to colors.
+    function contrastRatio (hexColor1, hexColor2){
+        // Get the RGB values.
+        let R1 = hexToRgb(hexColor1).r;
+        let G1 = hexToRgb(hexColor1).g;
+        let B1 = hexToRgb(hexColor1).b;
+
+        let R2 = hexToRgb(hexColor2).r;
+        let G2 = hexToRgb(hexColor2).g;
+        let B2 = hexToRgb(hexColor2).b;
+
+        let luminance1 = Luminance(R1, G1, B1);
+        let luminance2 = Luminance(R2, G2, B2);
+
+        let lighterLuminance = 0;
+        let darkerLuminance = 0;
+        
+        if (luminance1 > luminance2) {
+            lighterLuminance = luminance1;
+            darkerLuminance = luminance2;
+        } else {
+            lighterLuminance = luminance2;
+            darkerLuminance = luminance1;
+        }
+
+        let cRatio = (lighterLuminance + 0.05) / (darkerLuminance + 0.05);
+        cRatio = Math.floor(cRatio*100)/100
+
+        return cRatio;
+    }
+
+</script> 
+
+</body>
+</html>
