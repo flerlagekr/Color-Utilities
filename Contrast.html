@@ -75,6 +75,7 @@ the contrast ratios compared to another color.
             cRatio = contrastRatio(colorHex, contrastCode);
             ctx.fillText("Contrast Ratio: " + cRatio.toString() + " : 1", xPosition + xPad, yPosition + yPad + yTextPad);
 
+            // Check pass/fail for text and UI/Graphic elements.
             let textPass = "Fail";
             let UIPass = "Fail";
 
@@ -86,6 +87,7 @@ the contrast ratios compared to another color.
                 UIPass = "Pass";
             }
 
+            // Displya pass/fail for different elements.
             ctx.fillText("Text Elements: " + textPass, xPosition + xPad, yPosition + yPad + yTextPad*2);
             ctx.fillText("UI/Graphics: " + UIPass, xPosition + xPad, yPosition + yPad + yTextPad*3);
 
